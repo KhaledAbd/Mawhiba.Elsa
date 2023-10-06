@@ -28,12 +28,12 @@ namespace Elsa.Activities.Http.Endpoints.Signals
         }
 
         [HttpGet, HttpPost]
-        public async Task<IActionResult> Handle(string token, CancellationToken cancellationToken)
+        public async Task<IActionResult> Handle(string token,string data, CancellationToken cancellationToken)
         {
             if (!_tokenService.TryDecryptToken(token, out SignalModel signal))
                 return BadRequest();
 
-            var affectedWorkflows = await _signaler.TriggerSignalAsync(signal.Name, null, signal.WorkflowInstanceId, cancellationToken: cancellationToken).ToList();
+            var affectedWorkflows = await _signaler.TriggerSignalAsync(signal.Name, data, signal.WorkflowInstanceId, cancellationToken: cancellationToken).ToList();
 
             await _mediator.Publish(new HttpTriggeredSignal(signal, affectedWorkflows), cancellationToken);
 
